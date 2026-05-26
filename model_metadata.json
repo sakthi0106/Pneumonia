@@ -1,0 +1,43 @@
+{
+  "model_name": "EfficientNet-B4-Pneumonia",
+  "created_at": "2026-05-04T15:14:08.835497",
+  "config": {
+    "image_size": 380,
+    "batch_size": 16,
+    "epochs": 50,
+    "learning_rate": 0.0001,
+    "num_classes": 2,
+    "class_names": [
+      "NORMAL",
+      "PNEUMONIA"
+    ],
+    "stage_names": {
+      "0": "Normal / Resolution",
+      "1": "Pneumonia detected"
+    },
+    "stage_descriptions": {
+      "0": "No pneumonia detected. Normal lung fields.",
+      "1": "Pneumonia detected. Stage is estimated during backend inference from image severity features."
+    },
+    "data_dir": "data/chest_xray",
+    "model_save": "pneumonia_model_best.h5",
+    "model_final": "pneumonia_model_final.h5",
+    "dropout_rate": 0.4,
+    "seed": 42,
+    "fuzzy_nms_enabled": true,
+    "fuzzy_iou_thresh": 0.45,
+    "fuzzy_method": "gaussian"
+  },
+  "training_info": {
+    "phase1_epochs": 19,
+    "phase2_epochs": 9,
+    "final_train_acc": 0.7059049010276794,
+    "final_val_acc": 0.5,
+    "final_train_loss": 0.6489880681037903,
+    "final_val_loss": 0.8459523320198059
+  },
+  "class_mapping": {
+    "0": "NORMAL",
+    "1": "PNEUMONIA"
+  }
+}
