@@ -1339,31 +1339,28 @@ async function sendChat() {
 }
 
 async function callGeminiAPI(userMsg) {
-  const systemPrompt = `You are PneumoBot, an AI specialist focused exclusively on pneumonia. 
-You ONLY answer questions related to pneumonia — its stages, symptoms, diagnosis, treatment, prevention, and chest X-ray interpretation.
-If asked anything unrelated to pneumonia or lung health, politely redirect: "I'm specialized only in pneumonia-related questions. Please ask me about pneumonia symptoms, stages, treatment, or prevention."
-Current analysis result: ${analysisData ? JSON.stringify({stage: analysisData.stage, confidence: analysisData.conf}) : 'No analysis performed yet.'
-}
-Keep answers concise, clear, and clinically accurate. Use plain language suitable for patients and doctors.`;
+    const previousMessages = chatHistory.slice(0, -1).slice(-6);
 
-  const previousMessages = chatHistory.slice(0, -1).slice(-6);
+    const response = await fetch(apiUrl('/api/chat'), {
+        method: 'POST',
+        credentials: 'include',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            message: userMsg,
+            history: previousMessages,
+            analysis: analysisData
+        })
+    });
 
-  const response = await fetch('/api/chat', {
-    method:'POST',
-    headers:{ 'Content-Type':'application/json' },
-    body: JSON.stringify({
-      message: userMsg,
-      history: previousMessages,
-      analysis: analysisData
-    })
-  });
+    const data = await parseJsonResponse(response);
 
-  const data = await parseJsonResponse(response);
-  if (!response.ok) throw new Error(data.error || 'API error');
-  return {
-    reply: data.reply || 'I could not generate a response. Please try again.',
-    provider: data.provider || 'unknown'
-  };
+    if (!response.ok) {
+        throw new Error(data.error || 'Unable to connect to PneumoBot.');
+    }
+
+    return data.reply;
 }
 
 function getFallbackReply(msg) {
@@ -1639,18 +1636,17 @@ function clearAlert(id) {
 }
 
 async function postJson(url, payload) {
-const response = await fetch(apiUrl('/api/chat'), {
-  method: 'POST',
-  credentials: 'include',
-  headers: {
-    'Content-Type': 'application/json'
-  },
-  body: JSON.stringify({
-    message: userMsg,
-    history: previousMessages,
-    analysis: analysisData
-  })
-});
+    const response = await fetch(apiUrl(url), {
+        method: 'POST',
+        credentials: 'include',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(payload)
+    });
+
+    return await parseJsonResponse(response);
+}
 
   const data = await parseJsonResponse(res);
 
