@@ -42,7 +42,21 @@ load_env_file()
 
 app = Flask(__name__, static_folder=STATIC_DIR, static_url_path="")
 app.secret_key = os.environ.get("PNEUMO_SECRET_KEY", "dev-pneumo-ai-secret-key")
-CORS(app, supports_credentials=True)
+FRONTEND_ORIGIN = os.environ.get(
+    "FRONTEND_ORIGIN",
+    "https://pneumonia-five.vercel.app"
+)
+
+CORS(
+    app,
+    resources={r"/*": {"origins": [FRONTEND_ORIGIN]}},
+    supports_credentials=True
+)
+
+app.config.update(
+    SESSION_COOKIE_SAMESITE="None",
+    SESSION_COOKIE_SECURE=True
+)
 
 UPLOAD_FOLDER = os.path.join(BASE_DIR, "uploads")
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
