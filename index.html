@@ -885,6 +885,12 @@ textarea{font-family:'Inter',sans-serif}
 </div>
 
 <script>
+// Render Flask Backend URL
+const API_BASE_URL = "https://pneumo-ai-nn2u.onrender.com";
+
+function apiUrl(endpoint) {
+  return `${API_BASE_URL}${endpoint}`;
+}   
 /* ─── STATE ─── */
 let currentRole = 'patient';
 let currentUser = '';
@@ -1039,10 +1045,11 @@ async function analyzeImage(file) {
   const form = new FormData();
   form.append('image', file);
 
-  const response = await fetch('/api/analyze', {
-    method: 'POST',
-    body: form
-  });
+const response = await fetch(apiUrl('/api/analyze'), {
+  method: 'POST',
+  credentials: 'include',
+  body: form
+});
 
   const data = await parseJsonResponse(response);
   if (!response.ok) {
@@ -1632,17 +1639,27 @@ function clearAlert(id) {
 }
 
 async function postJson(url, payload) {
-  const res = await fetch(url, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(payload)
-  });
+const response = await fetch(apiUrl('/api/chat'), {
+  method: 'POST',
+  credentials: 'include',
+  headers: {
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({
+    message: userMsg,
+    history: previousMessages,
+    analysis: analysisData
+  })
+});
+
   const data = await parseJsonResponse(res);
+
   if (!res.ok) {
     const err = new Error(data.error || 'Request failed.');
     err.data = data;
     throw err;
   }
+
   return data;
 }
 
@@ -1784,9 +1801,10 @@ async function submitReset() {
 }
 
 async function doLogout() {
-  await fetch('/logout', { method: 'POST' });
-  document.getElementById('appPage').classList.remove('active');
-  showAuthPage('loginPage');
+   await fetch(apiUrl('/logout'), {
+  method: 'POST',
+  credentials: 'include'
+});
   resetApp();
 }
 </script>
